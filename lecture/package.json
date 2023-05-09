@@ -1,0 +1,20 @@
+{
+  "name": "lecture",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start_chap_01": "node index_01",
+    "start_chap_02": "node index_02"
+  },
+  "author": "blcklamb",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.4.0",
+    "cheerio": "^1.0.0-rc.12",
+    "csv-parse": "^4.16.3",
+    "puppeteer": "^20.1.1",
+    "xlsx": "^0.18.5"
+  }
+}
