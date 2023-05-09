@@ -19,13 +19,14 @@ const crawler = async () => {
         try {
           const page = await browser.newPage();
           await page.goto(r[1]);
-          const scoreEl = await page.$(
-            "._au_movie_content_wrap .detail_info .info"
-          );
-          if (scoreEl) {
-            const text = await page.evaluate((tag) => tag.textContent, scoreEl);
+          const text = await page.evaluate(() => {
+            const score = document.querySelector(
+              "._au_movie_content_wrap .detail_info .info"
+            );
+            if (score) return score.textContent;
+          });
+          if (text) {
             result[i] = [r[0], r[1], text.split("평점 ")[1].split(" ")[0]];
-            // console.log(r[0], "평점", text.split("평점 ")[1].split(" ")[0]);
           }
           await page.close();
         } catch (e) {
