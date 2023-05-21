@@ -3,12 +3,12 @@ import puppeteer from "puppeteer";
 import axios from "axios";
 import fs from "fs";
 import add_to_sheet from "./add_to_sheet.js";
-import { each } from "cheerio/lib/api/traversing";
 
 const workbook = xlsx.readFile("xlsx/new_data.xlsx");
 const ws = workbook.Sheets.영화목록;
 const records = xlsx.utils.sheet_to_json(ws);
 
+// ~sync 사용이 지양되지만 프로그램이 처음 시작또는 끝날 때는 사용해도 된다
 fs.readdir("screenshot", (err) => {
   if (err) {
     console.error("screenshot 폴더가 없어서 새로 생성합니다");
@@ -36,31 +36,51 @@ const crawler = async () => {
     for (const [i, r] of records.entries()) {
       await page.goto(r.링크);
 
-      const title = await page.evaluate(() => {
-        const eachTitle = document.querySelector(
+      const result = await page.evaluate(() => {
+        const titleElement = document.querySelector(
           ".css-j40qn0-TitleOnPosterBlock"
         );
-        if (eachTitle) return eachTitle.textContent;
+        let title = "";
+        if (titleElement) {
+          title = titleElement.textContent;
+        }
+
+        const scoreElement = document.querySelector(
+          ".css-og1gu8-ContentRatings"
+        );
+        let score = "";
+        if (scoreElement) {
+          score = scoreElement.textContent;
+        }
+
+        const posterElement = document.querySelector(".css-qhzw1o-StyledImg");
+        let poster = "";
+        if (posterElement) {
+          poster = posterElement.src;
+        }
+        return { title, score, poster };
       });
 
-      if (title) {
+      if (result.title) {
         const newCell = "A" + (i + 2);
-        add_to_sheet(ws, newCell, "n", title);
+        add_to_sheet(ws, newCell, "n", result.title);
       }
 
-      const score = await page.evaluate(() => {
-        const eachScore = document.querySelector(".css-og1gu8-ContentRatings");
-        if (eachScore) return eachScore.textContent;
-      });
-
-      if (score) {
+      if (result.score) {
         const newCell = "C" + (i + 2);
         add_to_sheet(
           ws,
           newCell,
           "n",
-          parseFloat(score.split("평균 ★")[1].split(" ")[0])
+          parseFloat(result.score.split("평균 ★")[1].split(" ")[0])
         );
+      }
+
+      if (result.poster) {
+        const imgResult = await axios.get(result.poster, {
+          responseType: "arraybuffer",
+        });
+        fs.writeFileSync(`poster/${result.title}.jpg`, imgResult.data);
       }
 
       await page.waitForTimeout(3000);
