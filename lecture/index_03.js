@@ -27,11 +27,13 @@ const crawler = async () => {
   try {
     const browser = await puppeteer.launch({
       headless: process.env.NODE_ENV === "production",
+      args: ["--window-size=1920,1080"],
     });
     const page = await browser.newPage();
     await page.setUserAgent(
       "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36"
     );
+    await page.setViewport({ width: 1920, height: 1080 });
     add_to_sheet(ws, "C1", "s", "평점");
     for (const [i, r] of records.entries()) {
       await page.goto(r.링크);
@@ -80,7 +82,12 @@ const crawler = async () => {
         const imgResult = await axios.get(result.poster, {
           responseType: "arraybuffer",
         });
-        fs.writeFileSync(`poster/${result.title}.jpg`, imgResult.data);
+        await page.screenshot({
+          path: `screenshot/${result.title}.png`,
+          fullPage: true,
+          // clip: { x: 100, y: 100, width: 300, height: 300 },
+        });
+        // fs.writeFileSync(`poster/${result.title}.jpg`, imgResult.data);
       }
 
       await page.waitForTimeout(3000);
