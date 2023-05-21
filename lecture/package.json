@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "start_chap_01": "node index_01",
-    "start_chap_02": "node index_02"
+    "start_chap_02": "node index_02",
+    "start_chap_03": "node index_03"
   },
   "author": "blcklamb",
   "license": "MIT",
