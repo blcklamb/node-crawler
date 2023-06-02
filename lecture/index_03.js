@@ -87,7 +87,7 @@ const crawler = async () => {
           fullPage: true,
           // clip: { x: 100, y: 100, width: 300, height: 300 },
         });
-        // fs.writeFileSync(`poster/${result.title}.jpg`, imgResult.data);
+        fs.writeFileSync(`poster/${result.title}.jpg`, imgResult.data);
       }
 
       await page.waitForTimeout(3000);
